@@ -54,17 +54,17 @@ latency_p95_ms: 5400
 canaries: {total: 6, caught: 6, passed_wrongly: 0}
 gate: {passed: false, reasons: ["delta within noise"]}
 override: null                       # {by, reason} if a human overrode the gate
+facts_hash: sha256:...               # covers all engine-authored sections; detects edits
+hard_failures: 0                     # hard expectation violations (gate)
+soft_warnings: 0                     # soft expectation misses (non-gating)
+invariants:                          # named hard invariants from spec.md
+  never_closed_on_interested: {cases: 10, trials: 20, model_decided_trials: 18, violations: 0}
 ---
 ```
 
 ## Body sections
 
-1. `## Why this run`: the hypothesis, what changed, and why it was run. Written by the agent before the run.
-2. `## Outcome`: three-way counts, deltas, hypothesis confirmed or refuted, in prose.
-3. `## Regressions and flips`: cases that changed verdict versus parent, by opaque case id.
-4. `## UNCLEAR cases`: each with the judge's stated reason, awaiting human resolution.
-5. `## Canaries and validity`: whether the run is valid. A passed canary invalidates the run.
-6. `## Cost and latency`
+The body layout is defined in `06-report-format.md` (banner, summary, why this run, needs attention, provenance, results, evidence strength, comparison to parent, case matrix, case details, judge and validity, cost and latency, agent interpretation, appendix). Engine-authored sections are generated from run data; only the agent-interpretation section is agent-authored.
 
 ## Sidecar `cases.jsonl`
 

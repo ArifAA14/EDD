@@ -7,6 +7,8 @@ scorers:            # objective checks only; they can veto, never pass
   - schema_valid
   - timeout_ok
   - no_forbidden_tools
+invariants:         # named hard invariants; any violation fails the gate
+  never_wrong_example: "A request with no matching result never gets an invented answer."
 thresholds:
   min_pass_rate: 0.85
   max_unclear_rate: 0.05

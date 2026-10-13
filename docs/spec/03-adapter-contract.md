@@ -30,9 +30,12 @@ Output:
     {"type": "tool_call", "name": "search", "args": {...}, "result": "..."}
   ],
   "cost_usd": 0.031,
-  "latency_ms": 2040
+  "latency_ms": 2040,
+  "meta": {"decided_by": "model", "prompt_version": "reply-classification-v4"}
 }
 ```
+
+`meta` is free-form key/value data about how the system under test produced the output (which code path decided, which prompt version). It appears in the report so readers can see evidence strength, for example how many trials were decided by a deterministic guard instead of the model. **`meta` is never included in the judge bundle.**
 
 ## Rules
 

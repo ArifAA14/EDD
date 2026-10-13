@@ -5,6 +5,9 @@ Goldens live in `evals/<feature>/goldens/dev/` and `evals/<feature>/goldens/hold
 ```markdown
 ---
 id: c_7f3a                 # opaque; never encodes author, feature version, or source
+title: "Interested reply quoting our unsubscribe footer"   # shown in reports; never sent to the judge
+description: "The exact shape that closed a real lead: positive new text, opt-out words only in the quoted footer."
+invariants: [never_closed_on_interested]   # named hard invariants this case exercises (declared in spec.md)
 kind: normal               # normal | edge | adversarial | canary
 source: prod_failure       # prod_failure | synthetic | human_written | mined
 added: 2026-10-13
@@ -19,9 +22,11 @@ tags: [empty-result]
 <golden expectation: the correct answer, or the properties a correct answer must have>
 
 ## Rubric
-- [ ] <criterion 1, checkable from the output>
-- [ ] <criterion 2>
+- [hard] <criterion 1, checkable from the output>
+- [soft] <criterion 2>
 ```
+
+`[hard]` criteria gate the run when unmet. `[soft]` criteria produce warnings and are counted separately in reports.
 
 ## Rules
 

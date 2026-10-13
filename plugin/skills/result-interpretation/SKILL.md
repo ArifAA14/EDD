@@ -5,6 +5,8 @@ description: Use after an eval run completes, to read the report correctly: nois
 
 # Reading an eval report
 
+Start with the report's banner, summary, and "Needs attention" sections (roughly the first 60 lines). Open case details only for flagged cases. Engine-authored sections are facts; you may only write in the agent-interpretation section, and you answer each finding's triage question there.
+
 Read in this order:
 
 1. **Validity.** If any canary passed, or the leak check failed, the run is invalid. Stop and fix the harness problem; do not interpret the numbers.
