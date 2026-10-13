@@ -1,0 +1,6 @@
+{
+  "name": "edd-harness",
+  "version": "0.0.1",
+  "description": "Eval-driven development harness: hypothesis-before-run, blind judge, gated completion.",
+  "author": { "name": "ZoolWorks" }
+}
