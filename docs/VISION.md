@@ -20,6 +20,7 @@ We do not promise "100% safe". An eval gives evidence, bounded by its goldens. T
 | Judge | Separate headless Claude Code process (`claude -p`) launched by the engine: no tools, no session history, no repo access, only the sealed bundle |
 | Judge fallback | In-session subagent mode allowed, labeled "judge not isolated" in the report; the gate never passes on it |
 | Judge model | User-configurable; defaults dev `sonnet`, gate `fable`. Non-Claude judges: not now |
+| v1 scope | Model calls and tool calls only. RAG pipelines, multi-step workflows and agent best practice come later, after experiments |
 | Storage | Local markdown reports + jsonl sidecars in git; no hosted platform |
 
 ## Principles (unchanged)
@@ -64,10 +65,20 @@ Engine, CLI (`run`, `diff`, `verify`, `annotate`, `override`, `promote`), blind 
 
 ## Open questions
 
-- Scope of "AI feature" for v1: model calls only, or also tool-using agents, RAG pipelines and multi-step workflows?
-- How strong the public claims should be.
-- How much of the existing report/stats layer to keep after the trim.
-- Which real project hosts the first dogfood (the reply classifier code path).
+- How much of the existing report/stats layer to keep after the trim. Decide after dogfooding, based on what gets read.
+- Agent evals (multi-step, tool-using trajectories): needs experiments before we commit to a design.
+- Public claim strength: deferred.
+
+## Dogfood plan (proposed)
+
+Several small-to-medium projects of different types, instead of one complex one, so the mapper and adapters meet variety:
+
+1. Single-call classifier, Python (the reply classifier).
+2. Generation with customer-facing text and format constraints, TypeScript.
+3. Model plus tool calls (e.g. a support bot that can call a refund or lookup tool), Python or TypeScript.
+4. A deliberately messy brownfield repo: prompts scattered across files, a wrapped model client, one dynamically built prompt. Used to test the mapper and see what it misses.
+
+Each project gets the full flow: map, adapters, goldens, baseline, a prompt change, a model change, and a deliberately bad change that the eval must catch.
 
 ## Risks
 
