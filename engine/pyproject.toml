@@ -1,6 +1,6 @@
 [project]
 name = "edd"
-version = "0.0.1"
+version = "0.1.0"
 description = "Eval-driven development engine: run, judge blind, diff, promote."
 requires-python = ">=3.11"
 dependencies = [
@@ -11,7 +11,7 @@ dependencies = [
 dev = ["pytest>=8"]
 
 [project.scripts]
-eval = "edd.cli:main"
+edd = "edd.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -19,3 +19,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+edd = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
