@@ -48,6 +48,10 @@ def _select(spec: dict, feature_dir: Path, run_type: str):
     return goldens, canaries, splits
 
 
+def _r1(x):
+    return None if x is None else round(x, 1)
+
+
 def _common(values: list) -> str | None:
     seen = sorted({str(v) for v in values if v})
     if not seen:
@@ -208,7 +212,7 @@ def run_eval(root: Path, feature: str, hypothesis: str, *, run_type: str = "dev"
                        "delta_ci95": [round(x, 6) for x in cmp_["ci"]], "verdict": cmp_["verdict"],
                        "flips_to_pass": len(cmp_["to_pass"]), "flips_to_fail": len(cmp_["to_fail"])} if cmp_ else None),
         "cost_usd": round(a["cost"]["sut"], 6), "judge_cost_usd": round(a["cost"]["judge"], 6),
-        "latency_p50_ms": a["cost"]["p50"], "latency_p95_ms": a["cost"]["p95"],
+        "latency_p50_ms": _r1(a["cost"]["p50"]), "latency_p95_ms": _r1(a["cost"]["p95"]),
         "canaries": {"total": a["canary"]["total"], "caught": a["canary"]["caught"],
                      "passed_wrongly": a["canary"]["passed_wrongly"]},
         "findings": {s: sum(f["severity"] == s for f in a["findings"]) for s in ("blocker", "warning", "note")},

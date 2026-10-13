@@ -15,6 +15,7 @@ budgets:
   p95_latency_ms: 5000
 hash_inputs:
   prompts: ["support_bot.py"]
+  config: ["bot_version.txt"]
 ---
 
 ## Job

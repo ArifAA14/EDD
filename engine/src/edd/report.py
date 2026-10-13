@@ -117,11 +117,12 @@ def _summary(fm, a) -> list[str]:
     lines.append(head)
     if d["has"]:
         lo = d["model_ci"][0] if d["model_ci"] else None
-        lines.append(
-            f"- **Evidence strength:** {d['model_trials']} of {a['n']} trials ({d['model_scenarios']} of {len(a['cases'])} scenarios) "
-            f"were decided by the model; {d['other_trials']} went through a non-model path and test that path, not the prompt."
-            + (f" Zero failures in the model-decided trials supports a true pass rate of at least {pct(lo)}, not 100%."
-               if c["FAIL"] == 0 and lo is not None else ""))
+        who = (f"{d['model_trials']} of {a['n']} trials ({d['model_scenarios']} of {len(a['cases'])} scenarios) were decided by the model; "
+               f"{d['other_trials']} went through a non-model path and test that path, not the prompt."
+               if d["other_trials"] else f"All {a['n']} trials were decided by the model.")
+        lines.append("- **Evidence strength:** " + who
+                     + (f" Zero failures in the model-decided trials supports a true pass rate of at least {pct(lo)}, not 100%."
+                        if c["FAIL"] == 0 and lo is not None else ""))
     else:
         lo = a["scenario"]["ci"][0] if a["scenario"]["ci"] else None
         lines.append(f"- **Evidence strength:** {len(a['cases'])} scenarios; scenario-level 95% CI {ci_str(a['scenario']['ci'])}."
@@ -212,7 +213,7 @@ def _evidence(a, goldens) -> list[str]:
         lines.append(f"- **Model-decided scenarios:** {d['model_scen_pass']}/{d['model_scenarios']} fully passing, 95% CI {ci_str(d['model_scen_ci'])}; trial level {d['model_pass']}/{d['model_trials']}, CI {ci_str(d['model_ci'])}.")
         lines.append(f"- **Stability (model-decided):** {d['stable_model_scenarios']} of {d['model_scenarios']} scenarios identical across trials in verdict, output and observed behavior.")
     if s["ci"]:
-        lines.append(f"- **What a clean run can and cannot show:** a true pass rate as low as {pct(s['ci'][0])} is still consistent with this sample.")
+        lines.append(f"- **What this sample can and cannot show:** at the scenario level, a true pass rate as low as {pct(s['ci'][0])} is still consistent with these results.")
     thin = sorted(t for t, v in a["by_tag"].items() if sum(1 for g in goldens.values() if t in g.tags and g.id in a["cases"]) < 3)
     if thin:
         lines.append(f"- **Tags covered by fewer than 3 cases:** {', '.join(f'`{t}`' for t in thin)}.")
