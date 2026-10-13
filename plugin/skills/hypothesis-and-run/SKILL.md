@@ -9,7 +9,7 @@ description: Use whenever you are about to run an eval, or after changing a prom
 
 Write the hypothesis in one or two sentences, with direction and magnitude where you can: "Reranking prompt change raises recall on empty-result cases; latency flat." Also state what would refute it.
 
-Then run: `eval run <feature> --hypothesis "<text>"`. The engine refuses to run without one.
+Then run: `edd run <feature> --hypothesis "<text>"`. The engine refuses to run without one.
 
 ## After the run
 

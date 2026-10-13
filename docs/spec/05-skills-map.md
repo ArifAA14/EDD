@@ -11,9 +11,9 @@ Rule: anything that must always hold is a **hook** or **engine** behavior. Anyth
 | No edits to `graders/`, rubrics, judge definition, bundle builder | PreToolUse hook |
 | Judge invoked by engine, never by the coding agent | Engine |
 | Bundle scrubbing and hashing | Engine |
-| Confidence intervals, flip analysis, parent chain | Engine (`eval diff`) |
+| Confidence intervals, flip analysis, parent chain | Engine (`edd diff`) |
 | Canary injection and validity check | Engine |
-| Hypothesis recorded before run | Engine refuses `eval run` without one |
+| Hypothesis recorded before run | Engine refuses `edd run` without one |
 
 ## Skills
 
@@ -21,7 +21,7 @@ Rule: anything that must always hold is a **hook** or **engine** behavior. Anyth
 |---|---|---|
 | `eval-spec-writing` | Turn a feature into tasks, scorers, rubric, thresholds, budgets | v1 |
 | `hypothesis-and-run` | Pre-run ritual, run, record confirmed or refuted | v1 |
-| `result-interpretation` | Noise vs signal, flips, cost explosions; call `eval diff`, never compute stats by hand | v1 |
+| `result-interpretation` | Noise vs signal, flips, cost explosions; call `edd diff`, never compute stats by hand | v1 |
 | `golden-authoring` | Good cases, edge and adversarial coverage, source and why-added | later |
 | `golden-mining` | Prod logs to candidate goldens, dedupe | later |
 | `scorer-design` | Objective checks only; scorers veto, never pass; validated against canaries | later |

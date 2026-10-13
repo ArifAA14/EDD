@@ -83,7 +83,7 @@ Stripping quoted history before the opt-out scan stops interested replies that q
 | Trials per case | 2 |
 | Judge | `<judge model id>`, tier dev, prompt `sha256:ex-judge-0001`, bundle spec v1 |
 | Judge isolation | sealed bundle, no tools, one case per call, random order |
-| Reproduce | `eval run reply-classification --trials 2 --hypothesis-file <hash-locked file>` at `4f2c9e1` |
+| Reproduce | `edd run reply-classification --trials 2 --hypothesis-file <hash-locked file>` at `4f2c9e1` |
 
 ## 5. Results
 

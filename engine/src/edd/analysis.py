@@ -7,6 +7,7 @@ from .stats import classify_delta, paired_bootstrap, wilson
 from .util import canonical_json, percentile
 
 ICON = {"PASS": "✅", "FAIL": "❌", "UNCLEAR": "❔"}
+MIN_CASES_FOR_COMPARISON = 10  # below this, "within noise" means "cannot tell", not "no change"
 _IGNORED_META = {"prompt_version", "model"}
 SEVERITY_ORDER = {"blocker": 0, "warning": 1, "note": 2}
 
@@ -51,6 +52,7 @@ def compare_runs(parent_trials: list[dict], new_trials: list[dict], seed: int = 
     return {
         "shared": len(shared), "only_parent": len(set(old) - set(new)), "only_new": len(set(new) - set(old)),
         "delta": delta, "ci": (lo, hi), "verdict": classify_delta(lo, hi),
+        "underpowered": len(shared) < MIN_CASES_FOR_COMPARISON,
         "to_fail": to_fail, "to_pass": to_pass, "stability_changes": stability,
         "parent_pass_rate": sum(_frac(ov[c]) for c in shared) / len(shared),
         "new_pass_rate": sum(_frac(nv[c]) for c in shared) / len(shared),
@@ -161,8 +163,15 @@ def analyze(spec: dict, goldens: dict, trials: list[dict], canaries: list[dict],
             pfm = parent["fm"]
             comparison["parent_id"] = parent["id"]
             comparison["parent_fm"] = pfm
-            if pfm.get("cost_usd"):
-                comparison["cost_delta_pct"] = (sut_cost - pfm["cost_usd"]) / pfm["cost_usd"] * 100
+            # Compare cost per case-trial: the two runs may cover different numbers of cases.
+            parent_trials_n = sum((pfm.get("verdict_counts") or {}).values())
+            if pfm.get("cost_usd") is not None and parent_trials_n and n:
+                comparison["parent_cost_per_trial"] = pfm["cost_usd"] / parent_trials_n
+                comparison["cost_per_trial"] = sut_cost / n
+                if comparison["parent_cost_per_trial"] > 0:
+                    comparison["cost_delta_pct"] = (
+                        (comparison["cost_per_trial"] - comparison["parent_cost_per_trial"])
+                        / comparison["parent_cost_per_trial"] * 100)
             if pfm.get("latency_p95_ms") and cost["p95"] is not None:
                 comparison["p95_delta_ms"] = cost["p95"] - pfm["latency_p95_ms"]
 

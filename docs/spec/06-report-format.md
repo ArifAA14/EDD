@@ -12,7 +12,7 @@ A report must let a reader who was not there answer five questions without openi
 
 ## Facts and interpretation are separate
 
-- **Engine-authored sections** (everything except section 12) are generated from run data. The agent cannot edit them. `facts_hash` in the frontmatter covers them, so tampering is detectable by `eval diff` and the gate.
+- **Engine-authored sections** (everything except section 12) are generated from run data. The agent cannot edit them. `facts_hash` in the frontmatter covers them, so tampering is detectable by `edd diff` and the gate.
 - **Agent-authored section 12** sits between `<!-- agent:begin -->` and `<!-- agent:end -->`. It holds interpretation, triage decisions, and the hypothesis outcome. It is labeled as such, so a reader never mistakes an opinion for a measurement.
 - The hypothesis itself is written before the run, hashed, and shown in section 2 unchanged.
 

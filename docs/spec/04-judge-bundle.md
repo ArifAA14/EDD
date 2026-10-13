@@ -4,8 +4,9 @@ The judge decides one thing: is this output correct for this input, per this rub
 
 ## Invocation
 
-- The engine invokes the judge headlessly with a fixed judge definition (`plugin/agents/judge.md`) and no repo access.
-- Read-only toolset: no Write, Edit, or Bash.
+- The engine invokes the judge headlessly: `claude -p --safe-mode --tools "" --no-session-persistence --output-format json --model <m> --system-prompt <prompt>`, run in an empty temp dir with the bundle on stdin. No tools, no repo access.
+- The judge prompt lives in the engine package (`engine/src/edd/prompts/judge.md`), protected by the PreToolUse hook. There is no plugin-level judge agent, so the coding agent cannot spawn or edit the judge.
+- Cost, duration and actual model are read from the CLI's JSON (`total_cost_usd`, `modelUsage`, `duration_ms`).
 - One case per call, isolated context, random order, parallelizable.
 - Structured output only.
 
@@ -16,7 +17,7 @@ The judge decides one thing: is this output correct for this input, per this rub
 | `case_id` | Opaque id, re-randomized per run |
 | `input` | The case input |
 | `expected` | Golden expectation |
-| `rubric` | Criteria list from the golden |
+| `rubric` | `[{id, criterion}]` from the golden; severity tags (`[hard]`/`[soft]`) are stripped |
 | `output` | The SUT output, scrubbed |
 | `trace` | Normalized trace, only if the rubric depends on it |
 
@@ -42,9 +43,12 @@ Agent or model names, the hypothesis, diffs, commit messages, report history, ba
 }
 ```
 
-- A verdict without quoted evidence is rejected and re-requested.
+- The judge returns per-criterion `met` (`true | false | null`) with a verbatim `evidence` quote. The engine derives the verdict: any hard criterion `false` -> FAIL; else any hard `null` -> UNCLEAR; else PASS. Soft misses become warnings.
+- `met: true` without a quote that appears in the output/trace (whitespace, case and curly-quote normalized) is rejected with one retry carrying feedback, then recorded UNCLEAR with `judge_valid: false`.
+- A top-level judge PASS contradicted by the criteria is flagged inconsistent; the derived verdict wins.
+- Adapter `meta` (decided_by, model, prompt_version) is shown in reports and never enters the bundle.
 - UNCLEAR means "cannot decide from the evidence given". The gate treats UNCLEAR as non-pass.
-- Borderline cases get a second judge run; disagreement becomes UNCLEAR.
+- Planned (not yet implemented): borderline cases get a second judge run; disagreement becomes UNCLEAR.
 
 ## Judge validity
 
@@ -55,7 +59,7 @@ Agent or model names, the hypothesis, diffs, commit messages, report history, ba
 
 ## Leak test
 
-A separate judge instance receives bundles and guesses which agent, model, or version produced them. Above-chance accuracy means the scrubber leaks. Part of the engine test suite.
+A separate judge instance receives bundles and guesses which agent, model, or version produced them. Above-chance accuracy means the scrubber leaks. Planned; not yet in the test suite. Current tests check bundle shape and strict leak needles.
 
 ## Tiering
 

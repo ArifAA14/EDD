@@ -165,7 +165,9 @@ def write_index(feature_dir: Path) -> None:
     else:
         lines.append("**Baseline:** none yet. Promote a passing gate run with `edd promote`.")
     hs = heads(feature_dir)
-    lines.append(f"**Chain heads:** {', '.join(f'`{h}`' for h in hs) or 'none'}" + (" (more than one head: branches diverged)" if len(hs) > 1 else ""))
+    by_id = {r["id"]: r["fm"] for r in reports}
+    lines.append("**Chain heads** (runs nothing else was compared to): "
+                 + ("; ".join(f"{by_id[h].get('run_type')} `{h}`" for h in hs) or "none"))
     lines += ["", "| Run | Type | Pass | vs parent | Gate | Findings (B/W/N) | Hypothesis → outcome |", "|---|---|---|---|---|---|---|"]
     for r in reversed(reports[-5:]):
         fm = r["fm"]
@@ -174,7 +176,8 @@ def write_index(feature_dir: Path) -> None:
         gate = fm.get("gate") or {}
         gate_s = "—" if gate.get("passed") is None else ("pass" if gate["passed"] else ("override" if fm.get("override") else "FAIL"))
         fnd = fm.get("findings") or {}
-        vp = (fm.get("vs_parent") or {}).get("verdict", "—")
+        vpd = fm.get("vs_parent") or {}
+        vp = f"{vpd['verdict']} (n={vpd['compared_cases']})" if vpd.get("verdict") else "—"
         hyp = str(fm.get("hypothesis", "")).replace("\n", " ")
         hyp = (hyp[:70] + "…") if len(hyp) > 70 else hyp
         marker = " ★" if r["id"] == base else ""

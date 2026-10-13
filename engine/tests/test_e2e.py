@@ -192,6 +192,16 @@ def test_report_ids_sort_in_creation_order_and_prefixes_must_be_unambiguous(make
         chain.resolve_id(feat, ids[0][:10])
 
 
+def test_cost_comparison_is_per_trial_when_case_sets_differ(make_project, fake_judge):
+    cases = [{"id": f"c_{i}"} for i in range(4)]
+    root, _ = make_project(dev=cases, answers={f"c_{i}": {"output": "GOOD", "cost": 0.5} for i in range(4)})
+    run(root, fake_judge, case_ids=["c_0", "c_1"])  # 4 case-trials, $2.00
+    second = run(root, fake_judge)                   # 8 case-trials, $4.00: same cost per trial
+    cmp_ = second["analysis"]["parent"]
+    assert cmp_["cost_delta_pct"] == pytest.approx(0.0)
+    assert not any(f["id"] == "cost_spike" for f in second["analysis"]["findings"])
+
+
 def test_diff_command(make_project, fake_judge, capsys):
     root, feat = make_project(dev=[{"id": "c_a"}, {"id": "c_b"}], answers={"c_a": "GOOD", "c_b": "GOOD"})
     first = run(root, fake_judge)

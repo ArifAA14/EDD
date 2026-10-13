@@ -3,7 +3,7 @@
 
 Intentionally not registered in hooks.json. A stub that exits 0 would wave
 everything through, which is exactly the false-pass failure this project exists
-to prevent. Wire it in Phase 2, once `eval run --gate` exists and this can fail
+to prevent. Wire it in Phase 2, once `edd run --gate` exists and this can fail
 closed on a missing or failing gate report.
 
 Planned behavior:

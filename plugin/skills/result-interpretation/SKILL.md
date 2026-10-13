@@ -15,7 +15,7 @@ Read in this order:
 4. **Flips.** Which cases moved to FAIL? Triage each: real bug, bad golden, or bad scorer. Only a real bug is fixed in the code. Never "fix" a regression by editing a grader, rubric, or golden.
 5. **Cost and latency.** A small quality gain at a large cost increase is not a win unless the spec budget allows it.
 
-Use `eval diff <report-a> <report-b>` for any comparison. Do not compute statistics by hand.
+Use `edd diff <feature> <report-a> <report-b>` for any comparison. Do not compute statistics by hand.
 
 ## Next step
 

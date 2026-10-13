@@ -40,7 +40,9 @@ def ci_str(ci) -> str:
 
 
 def money(x) -> str:
-    return "n/a" if x is None else f"${x:.2f}"
+    if x is None:
+        return "n/a"
+    return f"${x:.4f}" if 0 < x < 0.01 else f"${x:.2f}"
 
 
 def ms(x) -> str:
@@ -68,6 +70,13 @@ def case_list(ids, limit: int = 8) -> str:
 
 def pp(x) -> str:
     return f"{x * 100:+.1f} pp"
+
+
+def _verdict_text(p: dict) -> str:
+    text = p["verdict"].replace("_", " ")
+    if p["verdict"] == "within_noise" and p.get("underpowered"):
+        text += f"; only {p['shared']} shared cases, so this cannot rule out a real change"
+    return text
 
 
 def block(label: str, text: str) -> list[str]:
@@ -112,7 +121,7 @@ def _summary(fm, a) -> list[str]:
                  + (f" Hard invariants: {', '.join(f'`{i}`' for i in inv)}." if inv else ""))
     head = f"- **Headline:** {c['PASS']}/{a['n']} PASS ({pct(a['pass_rate'])}, 95% CI {ci_str(a['pass_ci'])}). {c['FAIL']} FAIL, {c['UNCLEAR']} UNCLEAR."
     p = a["parent"]
-    head += (f" Versus parent `{p['parent_id']}`: {pp(p['delta'])} on {p['shared']} shared cases ({p['verdict'].replace('_', ' ')})."
+    head += (f" Versus parent `{p['parent_id']}`: {pp(p['delta'])} on {p['shared']} shared cases ({_verdict_text(p)})."
              if p else " No parent run, so no comparison.")
     lines.append(head)
     if d["has"]:
@@ -230,11 +239,12 @@ def _comparison(fm, a) -> list[str]:
     pfm = p["parent_fm"]
     lines += [f"Parent: `{p['parent_id']}`. Compared on {p['shared']} shared cases ({p['only_parent']} only in parent, {p['only_new']} only in this run).", "",
               "| Metric | Parent | This run | Delta | 95% CI of delta | Verdict |", "|---|---|---|---|---|---|",
-              f"| Pass rate (shared cases) | {pct(p['parent_pass_rate'])} | {pct(p['new_pass_rate'])} | {pp(p['delta'])} | [{p['ci'][0] * 100:+.1f}, {p['ci'][1] * 100:+.1f}] pp | {p['verdict'].replace('_', ' ')} |",
+              f"| Pass rate (shared cases) | {pct(p['parent_pass_rate'])} | {pct(p['new_pass_rate'])} | {pp(p['delta'])} | [{p['ci'][0] * 100:+.1f}, {p['ci'][1] * 100:+.1f}] pp | {_verdict_text(p)} |",
               f"| Pass rate (whole run) | {pct(pfm.get('pass_rate'))} | {pct(a['pass_rate'])} | | | |",
               f"| Hard failures | {pfm.get('hard_failures', 'n/a')} | {a['hard_failures']} | | | |",
-              f"| System cost per run | {money(pfm.get('cost_usd'))} | {money(a['cost']['sut'])} | "
-              + (f"{p['cost_delta_pct']:+.1f}%" if p.get("cost_delta_pct") is not None else "n/a") + " | | |",
+              "| System cost per case-trial | "
+              + (f"${p['parent_cost_per_trial']:.4f} | ${p['cost_per_trial']:.4f}" if p.get("parent_cost_per_trial") is not None else "n/a | n/a")
+              + " | " + (f"{p['cost_delta_pct']:+.1f}%" if p.get("cost_delta_pct") is not None else "n/a") + " | | |",
               f"| p95 latency | {ms(pfm.get('latency_p95_ms'))} | {ms(a['cost']['p95'])} | "
               + (f"{p['p95_delta_ms']:+.0f} ms" if p.get("p95_delta_ms") is not None else "n/a") + " | | |", ""]
     fmt = lambda xs: ", ".join(f"`{x['case']}` ({x['before']} → {x['after']})" for x in xs) or "none"

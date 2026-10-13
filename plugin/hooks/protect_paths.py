@@ -19,7 +19,7 @@ import sys
 PROTECTED = [
     (re.compile(r"evals/[^/]+/goldens/holdout(/|$)"), "any"),
     (re.compile(r"evals/[^/]+/graders(/|$)"), "write"),
-    (re.compile(r"plugin/agents/judge\.md$"), "write"),
+    (re.compile(r"engine/src/edd/prompts/"), "write"),
     (re.compile(r"engine/src/edd/(bundle|judge)[^/]*\.py$"), "write"),
 ]
 READ_TOOLS = {"Read", "Grep", "Glob"}

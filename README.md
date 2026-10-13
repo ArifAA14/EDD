@@ -23,9 +23,9 @@ TDD asserts exact outputs. Agents are stochastic and judged on qualities like "d
 
 ```
 docs/spec/        Phase 0 specs (report schema, golden format, adapter contract, judge bundle, skills map)
-engine/           Python CLI engine: eval init | run | promote | diff
-plugin/           Claude Code plugin: hooks, skills, judge agent
-examples/         Sample feature showing the per-feature eval layout
+engine/           Python engine and `edd` CLI: run, diff, verify, annotate, override, promote
+plugin/           Claude Code plugin: hooks and skills (the judge lives in the engine, not the plugin)
+examples/         Sample feature, example report, and a runnable demo project
 ```
 
 Per-feature layout inside a project that uses the harness:
@@ -41,6 +41,25 @@ evals/<feature>/
   INDEX.md           last 5 runs + current baseline; the agent reads this first
 ```
 
+## Quickstart
+
+```bash
+cd engine && pip install -e . && pytest        # 46 tests, no network or judge needed
+edd run <feature> --hypothesis "what you expect, and what would refute it"
+edd run <feature> --gate --hypothesis "..."     # holdout + pinned goldens, strongest judge
+edd diff <feature> <report-a> <report-b>
+edd verify <feature> <report>                   # detects edited engine facts
+edd promote <feature> <report>                  # needs passing gate or logged override
+```
+
+The judge is `claude -p` (headless, no tools). A full end-to-end replay with the real judge (about 1.5 min, about $1):
+
+```bash
+examples/demo-project/run_demo.sh
+```
+
+Sample output of that replay is in `examples/demo-project/sample-output/`.
+
 ## Status
 
-Phase 0 (spec). See `docs/spec/` and `docs/ROADMAP.md`.
+Phase 1 (engine) is built: run, diff, verify, annotate, override, promote, blind judge, canaries, gate. Not yet: `edd init`, `edd revert`, wiring the Stop hook, double-judge on borderline cases, calibration set, statistical leak test. See `docs/ROADMAP.md`.
